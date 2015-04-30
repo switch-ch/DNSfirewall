@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # Get Top 500 ch domains from alexa
 # Change baseURL for other countries or categories.
+# Author: Matthias Seitz <matthias.seitz@switch.ch>
 #
 # Original made by Linus Särud, source from
 # https://gist.github.com/zulln/266de436c67a2cd178f9
