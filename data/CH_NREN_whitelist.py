@@ -1,4 +1,5 @@
 # SWITCH domains
+geo-life.ch
 badware.ch
 edu-id.ch
 eduhub.ch
