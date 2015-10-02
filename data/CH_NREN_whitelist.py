@@ -1,5 +1,4 @@
 # SWITCH domains
-geo-life.ch
 badware.ch
 edu-id.ch
 eduhub.ch
@@ -10,4 +9,3 @@ switch.ch
 switch.li
 switchcloud.ch
 switchcollection.ch
-geo-life.ch
