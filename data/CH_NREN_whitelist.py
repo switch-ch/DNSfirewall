@@ -9,3 +9,4 @@ switch.ch
 switch.li
 switchcloud.ch
 switchcollection.ch
+geo-life.ch
