@@ -1,111 +1,71 @@
 #!/usr/bin/python
-# This script expect a list of line-separated domains.
-# From this list of domains, a RPZ will be created.
-# The RPZ can then be used on a recurisve DNS server
+# This script expect a list of line separated domains.
+# From this list of domains, a RPZ will be then created.
+#
+# The created RPZ can be used on a recursive DNS server
 # as a white- or blacklist, depending on the position
 # of the RPZ and the rule.
+#
 # Author: Matthias Seitz <matthias.seitz@switch.ch>
- 
-import calendar
-import time
-import sys
- 
-SCRIPTUSAGE = "Usage: createRPZ.py [-v]\n"
-SCRIPTUSAGE += "-v      verbose mode. Show debug infos"
- 
-RPZ_NAME = "whitelist.rpz."
-DOMAINS_FILE_NAME = "domains.txt"
-ZONE_FILE_NAME = "rpz_whitelist.zone"
- 
+
+import calendar, re, time, sys
+
+rpz_name = 'whitelist.rpz.'
+domains_file_name = 'domains.txt'
+zone_file_name = 'rpz_whitelist.zone'
+
 # Timing values for the zone
-ZONE_SERIAL = calendar.timegm(time.gmtime())
-SLAVE_REFRESH_INTERVAL = 180    # 3min
-SLAVE_RETRY_INTERVAL = 60       # 1min
-SLAVE_EXPERIATION_TIME = 259200 # 3days
-NXDOMAIN_CACHE_TIME = 180       # 3min
-RECORD_TTL = 300                # 5min
- 
-def isVerboseMode():
-        if len(sys.argv) > 1:
-                if sys.argv[1] == "-v":
-                        return True
-                else:
-                        return False
-        else:
-                return False
- 
-def printVerboseInfos(infos):
-        print  "============================================================"
-        print infos
-        print
- 
-def collectAndPrintVerboseInfos():
-        if isVerboseMode():
-                verboseInfos = "Some verbose Text"
-                printVerboseInfos(verboseInfos)
- 
- 
-def getNumberOfLines(fileName):
-        with open(fileName) as f:
-                return sum(1 for _ in f)
- 
-def createZoneHeader():
-        header = RPZ_NAME + "   " + str(RECORD_TTL) + " IN SOA  none. cert.switch.ch. " + str(ZONE_SERIAL) + " " + \
-        str(SLAVE_REFRESH_INTERVAL) + " " + str(SLAVE_RETRY_INTERVAL) + " " + str(SLAVE_EXPERIATION_TIME) + " " + \
-        str(NXDOMAIN_CACHE_TIME) + "\n"
-        header += RPZ_NAME + "  " + str(RECORD_TTL) + " IN NS   LOCALHOST." + "\n"
- 
+zone_serial = calendar.timegm(time.gmtime())
+slave_refresh_interval = 180    # 3min
+slave_retry_interval = 60       # 1min
+slave_experiation_time = 259200 # 3days
+nxdomain_cache_time = 180       # 3min
+record_ttl = 300                # 5min
+
+def create_zone_header():
+        header = rpz_name + '   ' + str(record_ttl) + ' IN SOA  none. cert.switch.ch. ' + str(zone_serial) + ' ' + \
+        str(slave_refresh_interval) + ' ' + str(slave_retry_interval) + ' ' + str(slave_experiation_time) + ' ' + \
+        str(nxdomain_cache_time) + '\n'
+        header += rpz_name + '  ' + str(record_ttl) + ' IN NS   LOCALHOST.' + '\n'
+
         return header
- 
-def createZoneBody():
-        body = ""
+
+def create_zone_body():
+        body = ''
         try:
-                with open(DOMAINS_FILE_NAME) as f:
+                with open(domains_file_name) as f:
                         domains = f.readlines()
+                        # Remove empty elements
+                        domains = filter(lambda x: not re.match(r'^\s*$', x), domains)
+                        print 'Number of entries: ' + str(len(domains))
                         for d in domains:
                                 d = d.replace('\n','')
-                                body += d + "." + RPZ_NAME + "          300 IN CNAME    .\n"
+                                body += d + '.' + rpz_name + '          300 IN CNAME    .\n'
         except EnvironmentError:
-                raise Exception("Error with handling the file: " + DOMAINS_FILE_NAME + \
-                                "\nPossibly there is no such file.")
+                raise Exception('Error with handling the file: ' + domains_file_name + \
+                                '\nPlease check if file exists.')
         return body
- 
-def writeZoneFile(header, body):
+
+def write_zone_file(header, body):
         try:
-                f = open(ZONE_FILE_NAME, 'w')
+                f = open(zone_file_name, 'w')
                 f.write(header)
                 f.write(body)
                 f.close()
- 
-                if isVerboseMode():
-                        verboseInfos = "=== Zone content:\n\n"
-                        verboseInfos += header
-                        verboseInfos += body
-                        printVerboseInfos(verboseInfos)
- 
-                print "zone " + RPZ_NAME + " created\n"
-                print "number of lines: " + str(getNumberOfLines(ZONE_FILE_NAME))
+                print 'RPZ ' + rpz_name + ' created'
         except EnvironmentError:
-                raise Exception("Error with handling the file: " + ZONE_FILE_NAME + \
-                                "\nPossibly no write permission for the directory.")
- 
-def createZone():
+                raise Exception('Error with handling the file: ' + zone_file_name + \
+                                '\nPlease check if you have write permissions for the directory.')
+
+def create_zone():
         try:
-                header = createZoneHeader()
-                body = createZoneBody()
-                writeZoneFile(header, body)
- 
+                header = create_zone_header()
+                body = create_zone_body()
+                write_zone_file(header, body)
+
         except Exception as e:
-                print "Exception: " + str(e)
- 
-# handle parameters
-if len(sys.argv) == 1:
-        createZone()
- 
-elif len(sys.argv) == 2:
-        if sys.argv[1] == "-v":
-                createZone()
-        else:
-                print SCRIPTUSAGE
-else:
-        print SCRIPTUSAGE
+                print 'Exception: ' + str(e)
+
+# === MAIN
+if __name__ == '__main__':
+    create_zone()
