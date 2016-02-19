@@ -1,6 +1,6 @@
 # DNSfirewall
-The purpose of this repostitory is to share all relevant data for DNSfirewall.
-DNSfirewall is a project, initiated by SWITCH, with the primary goal to protect the institutions from the SWISS NREN against malicious domains. 
+The purpose of this repository is to collaborate and exchange data between the Swiss NREN intitutions and 3rd party customers of SWITCH.
+DNSfirewall is a project, initiated by SWITCH, with the primary goal to protect the institutions against malicious domains. 
 
 The technique behind DNSfirewall is DNS RPZ which was developed by ISC.
 
