@@ -40,7 +40,8 @@ def create_zone_body():
                         print 'Number of entries: ' + str(len(domains))
                         for d in domains:
                                 d = d.replace('\n','')
-                                body += d + '.' + rpz_name + '          300 IN CNAME    .\n'
+                                body += d + '.' + rpz_name + '          300 IN CNAME    rpz-passthru.\n'
+                                body += '*.' + d + '.' + rpz_name + '          300 IN CNAME    rpz-passthru.\n'
         except EnvironmentError:
                 raise Exception('Error with handling the file: ' + domains_file_name + \
                                 '\nPlease check if file exists.')
